@@ -1,4 +1,4 @@
-# 🛡️ PhishGuard AI
+#  PhishGuard AI
 
 > **A professional, AI-powered cybersecurity platform for real-time phishing URL detection and threat analysis.**
 
