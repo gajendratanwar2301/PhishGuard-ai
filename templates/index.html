@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="description" content="PhishGuard – AI-powered phishing URL detector with real-time cybersecurity education."/>
+  <title>PhishGuard – Cyber Threat Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#scanner" class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <path d="M14 2L3 7V15C3 21.1 7.9 26.7 14 28C20.1 26.7 25 21.1 25 15V7L14 2Z" fill="url(#ng)" stroke="rgba(0,212,255,.4)" stroke-width=".7"/>
+      <path d="M10 14l3 3 5-5" stroke="#00d4ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <defs><linearGradient id="ng" x1="3" y1="2" x2="25" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="rgba(0,212,255,.2)"/><stop offset="1" stop-color="rgba(0,232,122,.06)"/></linearGradient></defs>
+    </svg>
+    <span class="nav-logo-text">PhishGuard</span>
+  </a>
+  <div class="nav-links">
+    <a href="#scanner">Scanner</a>
+    <a href="#howitworks">How It Works</a>
+    <a href="#learn">Threat Library</a>
+    <a href="#redflags">Red Flags</a>
+    <a href="#protect">Stay Safe</a>
+  </div>
+  <a href="#scanner" class="nav-cta">Scan Now →</a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page">
+
+  <!-- ══ HERO / SCANNER ══ -->
+  <section id="scanner">
+    <div class="container">
+      <div class="hero-alert"><span class="alert-dot"></span>Live Threat Detection Active</div>
+      <h1 class="hero-title">Is This URL <span class="grad">Safe or a Trap?</span></h1>
+      <p class="hero-sub">Paste any URL below. Our AI analyzes 15 threat signals in milliseconds to protect you from phishing attacks.</p>
+
+      <div class="scanner-card">
+        <p class="scanner-label">URL Threat Scanner</p>
+        <form method="post" id="scanForm" novalidate>
+          <div class="input-row">
+            <div class="input-wrap">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="urlInput" name="url" autocomplete="off" spellcheck="false"
+                placeholder="https://example.com or paste any suspicious link…"
+                value="{{ url if url else '' }}"/>
+            </div>
+            <button type="submit" id="scanBtn">
+              <div class="spinner"></div>
+              <span class="btn-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Scan URL
+              </span>
+            </button>
+          </div>
+          <div class="scan-progress" id="scanBar"></div>
+        </form>
+
+        {% if result %}
+        <div class="result-wrap" id="resultCard">
+          <div class="result-card r-{{ result }}">
+            <div class="result-top">
+              <div class="result-icon-box">{% if result == 'safe' %}✅{% else %}⚠️{% endif %}</div>
+              <div>
+                <div class="result-title-txt">{% if result == 'safe' %}URL Appears Safe{% else %}Phishing Threat Detected!{% endif %}</div>
+                <div class="result-desc">{% if result == 'safe' %}No suspicious patterns found. Stay alert online.{% else %}Multiple phishing indicators detected. Do not visit this site.{% endif %}</div>
+                <span class="threat-badge {% if result == 'safe' %}tb-safe{% else %}tb-danger{% endif %}">
+                  <span class="badge-dot"></span>
+                  {% if result == 'safe' %}Threat Level: None{% else %}Threat Level: Critical{% endif %}
+                </span>
+              </div>
+            </div>
+            {% if flags %}
+            <div class="flags-row">
+              {% for f in flags %}<span class="flag-chip">⚡ {{ f }}</span>{% endfor %}
+            </div>
+            {% endif %}
+            {% if url %}<div class="result-url">🔗 {{ url }}</div>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STATS ══ -->
+  <div class="stats-wrap">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" data-count="1200000" data-suffix="">0</div>
+          <div class="stat-lbl">Phishing Sites Daily</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" data-count="15" data-suffix="">0</div>
+          <div class="stat-lbl">Features Analyzed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" data-count="3400000000" data-suffix="">0</div>
+          <div class="stat-lbl">Phishing Emails/Day</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" data-count="100" data-suffix="%">0</div>
+          <div class="stat-lbl">Model Accuracy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HOW IT WORKS ══ -->
+  <section id="howitworks">
+    <div class="container">
+      <div class="sec-head">
+        <div class="sec-tag"><span class="dot"></span>Process</div>
+        <h2 class="sec-title">How <span>PhishGuard</span> Works</h2>
+        <p class="sec-sub">Three steps from URL to verdict — all in under a second.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <span class="step-num">01</span>
+          <span class="step-icon">🔗</span>
+          <div class="step-title">Paste the URL</div>
+          <p class="step-text">Enter any URL you received via email, SMS, social media, or found online. No registration needed.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">02</span>
+          <span class="step-icon">🧠</span>
+          <div class="step-title">AI Analyzes 15 Signals</div>
+          <p class="step-text">Our Random Forest model inspects domain structure, HTTPS, keywords, symbols, TLD, IP patterns and more.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">03</span>
+          <span class="step-icon">🛡️</span>
+          <div class="step-title">Instant Verdict</div>
+          <p class="step-text">Get a clear Safe or Threat result with the exact indicators that triggered the alert — so you understand why.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PHISHING TYPES ══ -->
+  <section id="learn">
+    <div class="container">
+      <div class="sec-head">
+        <div class="sec-tag"><span class="dot"></span>Threat Library</div>
+        <h2 class="sec-title">Know Your <span>Enemy</span></h2>
+        <p class="sec-sub">Phishing comes in many forms. Understanding each type is your first line of defense.</p>
+      </div>
+      <div class="types-grid">
+
+        <div class="type-card" style="--tc:#00d4ff">
+          <span class="type-emoji">📧</span>
+          <div class="type-name">Email Phishing</div>
+          <p class="type-desc">Fake emails impersonating banks, PayPal, or tech companies. They urge you to click a link and "verify" your account.</p>
+          <div class="type-tip"><div class="tip-label">🔍 How to Spot It</div>Check the sender's actual email address — it's never the real domain.</div>
+        </div>
+
+        <div class="type-card" style="--tc:#a855f7">
+          <span class="type-emoji">📱</span>
+          <div class="type-name">Smishing (SMS)</div>
+          <p class="type-desc">Phishing attacks delivered over text messages — fake parcel tracking, bank alerts, or OTP requests with malicious links.</p>
+          <div class="type-tip"><div class="tip-label">🔍 How to Spot It</div>Legit services never ask for passwords over SMS. Never click unknown links in texts.</div>
+        </div>
+
+        <div class="type-card" style="--tc:#ff8f00">
+          <span class="type-emoji">📞</span>
+          <div class="type-name">Vishing (Voice)</div>
+          <p class="type-desc">Scammers call pretending to be tech support, the IRS, or your bank — creating urgency to extract credentials or money.</p>
+          <div class="type-tip"><div class="tip-label">🔍 How to Spot It</div>Hang up and call the official number yourself. Real agents never ask for OTPs.</div>
+        </div>
+
+        <div class="type-card" style="--tc:#00e87a">
+          <span class="type-emoji">🎯</span>
+          <div class="type-name">Spear Phishing</div>
+          <p class="type-desc">Highly targeted attacks using your personal info (name, employer, colleagues) to craft convincing, personalized messages.</p>
+          <div class="type-tip"><div class="tip-label">🔍 How to Spot It</div>Even if an email "knows" you, verify through a separate channel before acting.</div>
+        </div>
+
+        <div class="type-card" style="--tc:#ff3d5a">
+          <span class="type-emoji">👑</span>
+          <div class="type-name">Whaling</div>
+          <p class="type-desc">CEO fraud — targeting executives with fake urgent requests: wire transfers, credential resets, or confidential data leaks.</p>
+          <div class="type-tip"><div class="tip-label">🔍 How to Spot It</div>Always verify financial requests via phone, even if the email looks legitimate.</div>
+        </div>
+
+        <div class="type-card" style="--tc:#00d4ff">
+          <span class="type-emoji">🌐</span>
+          <div class="type-name">Pharming</div>
+          <p class="type-desc">DNS poisoning that redirects you from a real website to a fake one — without you ever clicking a suspicious link.</p>
+          <div class="type-tip"><div class="tip-label">🔍 How to Spot It</div>Check the padlock and exact domain in your browser bar on every sensitive site.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ RED FLAGS ══ -->
+  <section id="redflags">
+    <div class="container">
+      <div class="sec-head">
+        <div class="sec-tag" style="background:rgba(255,61,90,.07);border-color:rgba(255,61,90,.2);color:var(--red)"><span class="dot" style="background:var(--red)"></span>Warning Signs</div>
+        <h2 class="sec-title">Red Flags in <span>Suspicious URLs</span></h2>
+        <p class="sec-sub">Learn to read a URL like a security expert. These patterns almost always signal danger.</p>
+      </div>
+
+      <div class="flags-demo">
+        <p style="font-size:.7rem;color:var(--lo);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-family:'Inter',sans-serif">⚠️ Example Phishing URL Breakdown</p>
+        <div class="url-demo">
+          <span class="url-part up-ok">http</span>
+          <span class="url-part up-neutral">://</span>
+          <span class="url-part up-warn">secure-login</span>
+          <span class="url-part up-neutral">.</span>
+          <span class="url-part up-warn">paypa1</span>
+          <span class="url-part up-neutral">.</span>
+          <span class="url-part up-warn">verify-account</span>
+          <span class="url-part up-neutral">.</span>
+          <span class="url-part up-warn">xyz</span>
+          <span class="url-part up-neutral">/</span>
+          <span class="url-part up-warn">login?redirect=bank</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;font-family:'Inter',sans-serif;font-size:.72rem">
+          <span style="color:#ff8a9a">🔴 No HTTPS</span>
+          <span style="color:#ff8a9a">🔴 Hyphens in domain</span>
+          <span style="color:#ff8a9a">🔴 Typo: "paypa<b>1</b>" (digit not L)</span>
+          <span style="color:#ff8a9a">🔴 Suspicious TLD (.xyz)</span>
+          <span style="color:#ff8a9a">🔴 Keyword stuffing</span>
+        </div>
+      </div>
+
+      <div class="flags-list">
+        <div class="flag-item"><div class="flag-ico">🔒</div><div><div class="flag-name">No HTTPS</div><div class="flag-info">Real banks and shops always use HTTPS. HTTP means no encryption — your data is exposed.</div></div></div>
+        <div class="flag-item"><div class="flag-ico">🔤</div><div><div class="flag-name">Typosquatting</div><div class="flag-info">Subtle misspellings like "paypa1.com" or "arnazon.com" trick the eye at a glance.</div></div></div>
+        <div class="flag-item"><div class="flag-ico">➖</div><div><div class="flag-name">Excessive Hyphens</div><div class="flag-info">"secure-login-paypal-verify.com" — real companies rarely use hyphens in their primary domain.</div></div></div>
+        <div class="flag-item"><div class="flag-ico">🌐</div><div><div class="flag-name">Suspicious TLDs</div><div class="flag-info">Domains ending in .xyz, .biz, .info, .club are dirt-cheap and heavily abused by phishers.</div></div></div>
+        <div class="flag-item"><div class="flag-ico">🔢</div><div><div class="flag-name">IP Address as Domain</div><div class="flag-info">"http://192.168.1.1/login" — legitimate websites use domain names, not raw IP addresses.</div></div></div>
+        <div class="flag-item"><div class="flag-ico">📏</div><div><div class="flag-name">Abnormally Long URL</div><div class="flag-info">Phishing URLs often stuff keywords and parameters to look official while hiding the real domain.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PROTECT YOURSELF ══ -->
+  <section id="protect">
+    <div class="container">
+      <div class="sec-head">
+        <div class="sec-tag" style="background:rgba(0,232,122,.07);border-color:rgba(0,232,122,.15);color:var(--green)"><span class="dot" style="background:var(--green)"></span>Protection</div>
+        <h2 class="sec-title">Stay <span>One Step Ahead</span></h2>
+        <p class="sec-sub">Six habits that will make you almost impossible to phish.</p>
+      </div>
+      <div class="tips-grid">
+        <div class="tip-card"><span class="tip-ico">🔍</span><div class="tip-title">Verify Before You Click</div><p class="tip-text">Hover over links to preview the real URL. When in doubt, go directly to the official website by typing it yourself.</p></div>
+        <div class="tip-card"><span class="tip-ico">🔐</span><div class="tip-title">Enable 2FA Everywhere</div><p class="tip-text">Two-factor authentication means attackers can't log in even if they steal your password. Use an authenticator app, not SMS.</p></div>
+        <div class="tip-card"><span class="tip-ico">🗝️</span><div class="tip-title">Use a Password Manager</div><p class="tip-text">Password managers auto-fill only on the correct domain — if the URL is fake, they won't fill in your credentials.</p></div>
+        <div class="tip-card"><span class="tip-ico">📬</span><div class="tip-title">Don't Trust Urgency</div><p class="tip-text">"Your account will be suspended in 24 hours!" is a classic fear tactic. Slow down — urgency is a manipulation tool.</p></div>
+        <div class="tip-card"><span class="tip-ico">🔄</span><div class="tip-title">Keep Software Updated</div><p class="tip-text">Phishing often exploits outdated browsers or plugins. Enable auto-updates and use a browser with built-in phishing protection.</p></div>
+        <div class="tip-card"><span class="tip-ico">🚨</span><div class="tip-title">Report Phishing Attempts</div><p class="tip-text">Forward suspicious emails to your IT team or report@phishing.gov. Reporting helps protect thousands of others from the same attack.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">🛡️ PhishGuard</span>
+    <p class="footer-text">
+      Powered by Random Forest ML &nbsp;<span>·</span>&nbsp; 15 Features &nbsp;<span>·</span>&nbsp; 60+ Training Samples<br/>
+      For educational purposes only &nbsp;<span>·</span>&nbsp; Never trust suspicious URLs &nbsp;<span>·</span>&nbsp; Stay safe online
+    </p>
+  </footer>
+
+</div><!-- .page -->
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
