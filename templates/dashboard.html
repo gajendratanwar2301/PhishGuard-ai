@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PhishGuard AI – Analytics Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="padding-top: 80px;">
+
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <span class="nav-logo-text">PhishGuard AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="/">Scanner</a>
+    <a href="/dashboard" class="active">Analytics</a>
+  </div>
+</nav>
+
+<div class="container page" style="max-width: 1200px;">
+  <div class="sec-head" style="text-align: left; margin-bottom: 30px;">
+    <h1 class="sec-title">Security <span class="grad">Analytics</span></h1>
+    <p class="sec-sub" style="margin: 0;">Real-time insights and scan history.</p>
+  </div>
+
+  <div class="stats-grid" style="margin-bottom: 40px; background: rgba(7,17,30,.92); border: 1px solid var(--border);">
+    <div class="stat-box">
+      <div class="stat-num">{{ total }}</div>
+      <div class="stat-lbl">Total Scans</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color: var(--green);">{{ safe_count }}</div>
+      <div class="stat-lbl">Safe URLs</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color: var(--red);">{{ phish_count }}</div>
+      <div class="stat-lbl">Threats Detected</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" style="color: var(--orange);">{{ avg_risk }}</div>
+      <div class="stat-lbl">Avg Risk Score</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 40px;">
+    
+    <!-- Chart -->
+    <div class="scanner-card" style="padding: 24px; max-width: none;">
+      <p class="scanner-label">Threat Distribution</p>
+      <div style="position: relative; height: 250px; width: 100%; display: flex; justify-content: center;">
+        <canvas id="threatChart"></canvas>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="scanner-card" style="padding: 24px; max-width: none; overflow-x: auto;">
+      <p class="scanner-label">Recent Investigations</p>
+      <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 0.85rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border); color: var(--lo);">
+            <th style="padding: 12px 8px;">Time</th>
+            <th style="padding: 12px 8px;">URL</th>
+            <th style="padding: 12px 8px;">Risk</th>
+            <th style="padding: 12px 8px;">Verdict</th>
+            <th style="padding: 12px 8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scan in history %}
+          <tr style="border-bottom: 1px solid rgba(255,255,255,.02);">
+            <td style="padding: 12px 8px; color: var(--mid);">{{ scan.timestamp.split()[1] }}</td>
+            <td style="padding: 12px 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace;">{{ scan.url }}</td>
+            <td style="padding: 12px 8px;">
+              <span style="color: {% if scan.risk_score > 75 %}var(--red){% elif scan.risk_score > 50 %}var(--orange){% elif scan.risk_score > 20 %}var(--yellow){% else %}var(--green){% endif %}">
+                {{ scan.risk_score }}/100
+              </span>
+            </td>
+            <td style="padding: 12px 8px;">
+              {% if scan.result == 'safe' %}
+                <span class="threat-badge tb-safe" style="margin: 0; padding: 2px 8px; font-size: 0.6rem;">Safe</span>
+              {% else %}
+                <span class="threat-badge tb-danger" style="margin: 0; padding: 2px 8px; font-size: 0.6rem;">Phishing</span>
+              {% endif %}
+            </td>
+            <td style="padding: 12px 8px;">
+              <a href="/report/{{ scan.id }}" class="nav-cta" style="padding: 4px 10px; font-size: 0.65rem;" download>Report ↓</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="padding: 20px; text-align: center; color: var(--mid);">No scans performed yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('threatChart');
+  if(ctx && {{ total }} > 0) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Safe', 'Phishing'],
+        datasets: [{
+          data: [{{ safe_count }}, {{ phish_count }}],
+          backgroundColor: ['#00e87a', '#ff3d5a'],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#e8f0fe', font: { family: 'Inter' } } }
+        },
+        cutout: '75%'
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>
