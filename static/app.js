@@ -80,3 +80,72 @@ if (ham && navL) {
     ham.classList.toggle('open', !open);
   });
 }
+
+// ── Sound Effects ─────────────────────────────────────────────────────────────
+function getAudioCtx() {
+  return new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playSafeSound() {
+  try {
+    const ctx = getAudioCtx();
+    // Pleasant ascending chime: C-E-G chord
+    [261.63, 329.63, 392.00, 523.25].forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type      = 'sine';
+      osc.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.1;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      osc.start(t); osc.stop(t + 0.5);
+    });
+    // Speech after chime
+    setTimeout(() => {
+      const msg = new SpeechSynthesisUtterance("It's clean bro!");
+      msg.rate = 0.92; msg.pitch = 1.2; msg.volume = 1;
+      window.speechSynthesis.speak(msg);
+    }, 600);
+  } catch(e) { console.warn('Sound error:', e); }
+}
+
+function playPhishingSound() {
+  try {
+    const ctx  = getAudioCtx();
+    const dur  = 1.8;
+    // Siren: oscillate between 600Hz and 1200Hz
+    const osc  = ctx.createOscillator();
+    const lfo  = ctx.createOscillator();
+    const lfog = ctx.createGain();
+    const gain = ctx.createGain();
+    lfo.connect(lfog); lfog.connect(osc.frequency);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type      = 'sawtooth';
+    osc.frequency.value = 900;
+    lfo.type      = 'sine';
+    lfo.frequency.value = 3;
+    lfog.gain.value = 300;
+    gain.gain.setValueAtTime(0.22, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + dur);
+    lfo.start(ctx.currentTime); lfo.stop(ctx.currentTime + dur);
+    // Speech after siren
+    setTimeout(() => {
+      const msg = new SpeechSynthesisUtterance("Warning! Phishing detected! Do not visit this site!");
+      msg.rate = 1.05; msg.pitch = 0.85; msg.volume = 1;
+      window.speechSynthesis.speak(msg);
+    }, 700);
+  } catch(e) { console.warn('Sound error:', e); }
+}
+
+// Auto-play on result
+const resultCard = document.getElementById('resultCard');
+if (resultCard) {
+  // Small delay so page renders first
+  setTimeout(() => {
+    if (resultCard.querySelector('.r-safe'))     playSafeSound();
+    else if (resultCard.querySelector('.r-phishing')) playPhishingSound();
+  }, 500);
+}
